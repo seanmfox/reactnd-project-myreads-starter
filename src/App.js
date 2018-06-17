@@ -19,8 +19,16 @@ class BooksApp extends Component {
     BooksAPI.getAll().then(books => {
       console.log(books)
       this.setState({books})
+  })}
+
+  bookUpdate(book, category) {
+    BooksAPI.update(book, category).then(() => {
+      BooksAPI.getAll().then(books => {
+        console.log(books)
+        this.setState({books})
+    })
     }
-  )
+    )
   }
 
   render() {
@@ -48,7 +56,6 @@ class BooksApp extends Component {
             </div>
           </div>
         ) : (
-
             <div className="open-search">
               <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
             </div>
@@ -56,6 +63,7 @@ class BooksApp extends Component {
         <div>
           <ListBooks 
             books = {this.state.books}
+            onBookUpdate = {(book, category) => { this.bookUpdate(book, category)}}
             />
         </div>
       </div>
