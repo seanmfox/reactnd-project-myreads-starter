@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Book from './Book';
-
+import { Link } from 'react-router-dom'
 
 class ListBooks extends Component {
   onBookUpdate(book, category) {
@@ -14,6 +14,7 @@ class ListBooks extends Component {
                           {shelfName: 'wantToRead', displayName: 'Want to Read'},
                           {shelfName: 'read', displayName: 'Read'}]
     return (
+      <div>
       <div className="list-books">
         <div className="list-books-title">
           <h1>MyReads</h1>
@@ -40,6 +41,12 @@ class ListBooks extends Component {
           </div>
         </div>
       </div>
+                  <div className="open-search">
+                  <Link 
+                  to="/search"
+                  >Add a book</Link>
+                </div>
+                </div>
     )
   }
 }
