@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
+import BookCategory from './BookCategory'
 import ListBooks from './ListBooks'
 
 class BooksApp extends Component {
@@ -12,7 +13,8 @@ class BooksApp extends Component {
      * users can use the browser's back and forward buttons to navigate between
      * pages, as well as provide a good URL they can bookmark and share.
      */
-    showSearchPage: false
+    showSearchPage: false,
+    query: ''
   }
 
   componentDidMount() {
@@ -22,16 +24,32 @@ class BooksApp extends Component {
   })}
 
   bookUpdate(book, category) {
-    BooksAPI.update(book, category).then(() => {
-      BooksAPI.getAll().then(books => {
-        console.log(books)
-        this.setState({books})
+    BooksAPI.update(book, category).then((r) => {
+      book['shelf'] = category
+      this.setState(state => ({
+        books: state.books.filter(b => b.id !== book.id).concat([book])
+      }))
     })
-    }
-    )
+    console.log(this.state.books)
   }
 
+  updateQuery = (query) => {
+    this.setState({ query: query.trim() })
+  }
+
+
   render() {
+
+    const { query } = this.state
+
+    let results = []
+    if (query) {
+    BooksAPI.search(query).then(data => {
+      results = data
+      console.log(results)
+    })
+    }
+
     return (
       <div className="app">
         {this.state.showSearchPage ? (
@@ -47,25 +65,42 @@ class BooksApp extends Component {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-                <input type="text" placeholder="Search by title or author"/>
+                <input type="text" placeholder="Search by title or author" value={query} onChange={(e) => this.updateQuery(e.target.value)}/>
 
               </div>
             </div>
             <div className="search-books-results">
-              <ol className="books-grid"></ol>
+              <ol className="books-grid">
+              {results.map((book) => (
+                      <li key={book.id}>
+                        <div className="book">
+                        {/* <div className="book-top">
+                          <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
+                          <BookCategory 
+                          shelf={book.shelf}
+                          onRecategorizeBook={(category) => {
+                            this.recategorizeBook(book, category)
+                          }}/>
+                      </div> */}
+                      <div className="book-title">{book.title}</div>
+                        <div className="book-authors">{book.authors.join(', ')}</div>
+                      </div>
+                      </li>
+                    ))}
+              </ol>
             </div>
           </div>
-        ) : (
-            <div className="open-search">
-              <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
-            </div>
-        )}
+        ) : (          
         <div>
           <ListBooks 
             books = {this.state.books}
             onBookUpdate = {(book, category) => { this.bookUpdate(book, category)}}
             />
+            <div className="open-search">
+              <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
+            </div>
         </div>
+        )}
       </div>
     )
   }
