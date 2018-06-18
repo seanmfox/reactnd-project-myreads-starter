@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-// import * as BooksAPI from './BooksAPI'
-import BookCategory from './BookCategory'
+import Book from './Book';
+
 
 class ListBooks extends Component {
-  recategorizeBook(book, category) {
-    this.props.onBookUpdate(book, category)
+  onBookUpdate(book, category) {
+    this.props.bookUpdate(book, category)
   }
+  
 
   render() {
     const {books} = this.props
@@ -25,20 +26,12 @@ class ListBooks extends Component {
                 <div className="bookshelf-books">
                   <ol className="books-grid">
                     {books.filter((book) => book.shelf === `${shelfing.shelfName}`).map((book) => (
-                      <li key={book.id}>
-                        <div className="book">
-                        <div className="book-top">
-                          <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                          <BookCategory 
-                          shelf={book.shelf}
-                          onRecategorizeBook={(category) => {
-                            this.recategorizeBook(book, category)
-                          }}/>
-                      </div>
-                      <div className="book-title">{book.title}</div>
-                        <div className="book-authors">{book.authors.join(', ')}</div>
-                      </div>
-                      </li>
+
+                      <Book 
+                        key = {book.id}
+                        book={book}
+                        books={books}
+                        onRecategorizeBook = {(category) => { this.onBookUpdate(book, category)}}/>
                     ))}
                   </ol>
                 </div>

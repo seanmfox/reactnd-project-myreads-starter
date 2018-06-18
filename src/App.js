@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
-import BookCategory from './BookCategory'
 import ListBooks from './ListBooks'
+import Search from './Search';
 
 class BooksApp extends Component {
   state = {
@@ -14,12 +14,12 @@ class BooksApp extends Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     showSearchPage: false,
-    query: ''
+    query: '',
+    results: []
   }
 
   componentDidMount() {
     BooksAPI.getAll().then(books => {
-      console.log(books)
       this.setState({books})
   })}
 
@@ -34,21 +34,27 @@ class BooksApp extends Component {
   }
 
   updateQuery = (query) => {
-    this.setState({ query: query.trim() })
+    this.setState({ query: query })
+    this.updateResults(query)
   }
 
+  updateResults = (query) => {
+    if(query !== "") {
+    BooksAPI.search(query).then(data => {
+      if (!data.error) {
+      this.setState({results: data })
+    } else {
+      this.setState({results: []})
+    }
+    })
+  } else {
+    this.setState({results: []})
+  }
+  }
 
   render() {
 
-    const { query } = this.state
-
-    let results = []
-    if (query) {
-    BooksAPI.search(query).then(data => {
-      results = data
-      console.log(results)
-    })
-    }
+    const { query, books, results } = this.state
 
     return (
       <div className="app">
@@ -69,32 +75,18 @@ class BooksApp extends Component {
 
               </div>
             </div>
-            <div className="search-books-results">
-              <ol className="books-grid">
-              {results.map((book) => (
-                      <li key={book.id}>
-                        <div className="book">
-                        {/* <div className="book-top">
-                          <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                          <BookCategory 
-                          shelf={book.shelf}
-                          onRecategorizeBook={(category) => {
-                            this.recategorizeBook(book, category)
-                          }}/>
-                      </div> */}
-                      <div className="book-title">{book.title}</div>
-                        <div className="book-authors">{book.authors.join(', ')}</div>
-                      </div>
-                      </li>
-                    ))}
-              </ol>
-            </div>
+
+              <Search 
+                books = {books}
+                bookSearch = {results}
+                bookUpdate = {(book, category) => { this.bookUpdate(book, category)}}
+              />
           </div>
         ) : (          
         <div>
           <ListBooks 
-            books = {this.state.books}
-            onBookUpdate = {(book, category) => { this.bookUpdate(book, category)}}
+            books = {books}
+            bookUpdate = {(book, category) => { this.bookUpdate(book, category)}}
             />
             <div className="open-search">
               <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
