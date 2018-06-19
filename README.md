@@ -12,6 +12,11 @@ This app is a component of the Udacity Front-End Nanodegree program.  Special at
 2. Install all project dependencies with `npm install`
 3. Start the development server with `npm start`
 
+## How to use
+
+* Each book can be assigned to three shelves using the arrow icon on each book: 'currently reading', 'want to read' or 'read'.  In addition, a book can be removed from the bookshelf by selecting 'none'.
+* Clicking the plus button will load the search page.  Searched books can be added to the different book shelves using the arrow icon on each book.  Note the important comment below regarding viable search terms.
+
 ## Dependencies
 
 This app has the following dependencies (contained in package.json):
